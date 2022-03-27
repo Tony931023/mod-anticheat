@@ -737,15 +737,35 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
             QueryResult result = CharacterDatabase.Query("SELECT `jail` FROM `antihack_jail` WHERE `guid` = '{}'", player->GetGUID());
 			
 			std::string playername;
-			uint32 mapId;
+			//uint32 mapId;
 
             playername = player->GetName();
-            mapId =  player->GetMap()->GetId();
+            //mapId =  player->GetMap()->GetId();
             
             if (!result)
                 return;
 			
-			
+			if  (player->GetMapId() == 1 &&  player->GetZoneId() == 876)
+				return;
+			else {
+				if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true)) {
+					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, player->GetMap()->GetId());
+				}
+				
+				// display warning at the center of the screen, hacky way?
+				std::string str = "";
+				str = "|cFFFFFC00[Playername:|cFF00FFFF[|cFF60FF00" + std::string(player->GetName().c_str()) + "|cFF00FFFF] Auto Jailed for attempted prison break!";
+				WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+				data << str;
+				sWorld->SendGlobalGMMessage(&data);
+
+				WorldLocation loc;
+				loc = WorldLocation(1, 16226.5f, 16403.6f, -64.5f, 3.2f); // GM Jail Location
+				player->TeleportTo(loc);
+				player->SetHomebind(loc, 876); // GM Jail Homebind location
+				player->CastSpell(player, 38505); // Shackle him in place to ensure no exploit happens for jail break attempt
+				
+			}
             
         }
 }
