@@ -735,8 +735,6 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
                 return;
 
             
-				
-			}
             
         }
 }
