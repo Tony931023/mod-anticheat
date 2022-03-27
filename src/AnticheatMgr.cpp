@@ -729,7 +729,7 @@ void AnticheatMgr::ResetDailyReportStates()
 
 void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
 {
-    if (JailbreakCheck)
+    if (!sConfigMgr->GetOption<bool>("Anticheat.JailbreakCheck", true))
         {
             if (player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
                 return;
