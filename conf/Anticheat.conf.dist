@@ -128,3 +128,6 @@ Anticheat.ReportsForJail = 70
 Anticheat.AnnounceKick = 0
 Anticheat.AnnounceBan = 0
 Anticheat.AnnounceJail = 0
+Anticheat.JailbreakCheck = 0
+
+
