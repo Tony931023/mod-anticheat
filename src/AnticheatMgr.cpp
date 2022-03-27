@@ -745,6 +745,8 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
             if (!result)
                 return;
 			
+			if  (player->GetMapId() == 1 &&  player->GetZoneId() == 876)
+				return;
 			else {
 				if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true)) {
 					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, mapId);
