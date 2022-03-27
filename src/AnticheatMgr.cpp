@@ -745,7 +745,7 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
             if (!result)
                 return;
 			
-			if  (player->GetMapId() == 1 &&  player->GetZoneId() == 876)
+			if  (player->GetMap()->GetId() == 1 &&  player->GetZoneId() == 876)
 				return;
 			else {
 				if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true)) {
