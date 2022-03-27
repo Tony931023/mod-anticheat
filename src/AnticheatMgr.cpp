@@ -749,7 +749,7 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
 				return;
 			else {
 				if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true)) {
-					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, mapId);
+					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, player->GetMap()->GetId());
 				}
 				
 				// display warning at the center of the screen, hacky way?
