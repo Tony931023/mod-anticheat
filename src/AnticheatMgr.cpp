@@ -733,23 +733,23 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
         {
             if (player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
                 return;
-			std::string result;
+			
             QueryResult result = CharacterDatabase.Query("SELECT `jail` FROM `antihack_jail` WHERE `guid` = '{}'", player->GetGUID().GetCounter());
 			
 			std::string playername;
 			//uint32 mapId;
 			LOG_INFO("module", "AnticheatMgr:: Prueba {}  ", result);
             playername = player->GetName();
-            //mapId =  player->GetMap()->GetId();
+            mapId =  player->GetMap()->GetId();
             
             if (!result)
                 return;
 			
-			if  (player->GetMap()->GetId() == 1 &&  player->GetZoneId() == 876)
+			if  (player->GetMapId() == 1)
 				return;
 			else {
 				if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true)) {
-					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, player->GetMap()->GetId());
+					LOG_INFO("module", "AnticheatMgr:: Prison break attempt detected by the player {} , on the map {} ", playername, mapId);
 				}
 				
 				// display warning at the center of the screen, hacky way?
