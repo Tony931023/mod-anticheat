@@ -738,7 +738,7 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
 			
 			std::string playername;
 			uint32 mapId;
-			LOG_INFO("module", "AnticheatMgr:: Prueba {}  ", result);
+			
             playername = player->GetName();
             mapId =  player->GetMap()->GetId();
             
