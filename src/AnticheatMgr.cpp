@@ -737,7 +737,7 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
             QueryResult result = CharacterDatabase.Query("SELECT `jail` FROM `antihack_jail` WHERE `guid` = '{}'", player->GetGUID().GetCounter());
 			
 			std::string playername;
-			//uint32 mapId;
+			uint32 mapId;
 			LOG_INFO("module", "AnticheatMgr:: Prueba {}  ", result);
             playername = player->GetName();
             mapId =  player->GetMap()->GetId();
