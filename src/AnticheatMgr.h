@@ -93,7 +93,7 @@ class AnticheatMgr
         void TeleportHackDetection(Player* player, MovementInfo movementInfo);
         void IgnoreControlHackDetection(Player* player, MovementInfo movementInfo);
         void BuildReport(Player* player,uint16 reportType);
-		void JailbreakCheckOnMapChanged(Player* player);
+		
 
         bool MustCheckTempReports(uint8 type);
 
