@@ -733,7 +733,7 @@ void AnticheatMgr::JailbreakCheckOnMapChanged(Player* player)
         {
             if (player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
                 return;
-
+			std::string result;
             QueryResult result = CharacterDatabase.Query("SELECT `jail` FROM `antihack_jail` WHERE `guid` = '{}'", player->GetGUID().GetCounter());
 			
 			std::string playername;
