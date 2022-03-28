@@ -21,6 +21,7 @@ public:
 
     void OnMapChanged(Player* player)
     {
+		LOG_INFO("module", "AnticheatMgr:: OnMapChanged retorna 24 ");
           if (!sConfigMgr->GetOption<bool>("Anticheat.JailbreakCheck", true))
 		  {
             if (player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
@@ -32,8 +33,9 @@ public:
             mapId =  player->GetMap()->GetId();
 			maparea = player->GetZoneId();
             
-            if (!result)
-                return;
+            if (!result){
+				LOG_INFO("module", "AnticheatMgr:: Osin resultado 37 ");
+			return;}
 			
 			if  (player->GetMapId() == 1) {
 				
