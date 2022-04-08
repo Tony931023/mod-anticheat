@@ -26,7 +26,7 @@ o puede [descargar manualmente el módulo](https://github.com/azerothcore/mod-an
 
 ### 2) Vuelva a ejecutar cmake e inicie una compilación limpia de AzerothCore
 
-### 3) Ejecute el archivo "\sql\characters\base\charactersdb_anticheat.sql" incluido en su base de datos de personajes y ejecute "\sql\world\Acore_strings.sql" en su base de datos world. Esto crea las tablas necesarias para este módulo.
+### 3) Ejecute el archivo `\sql\characters\base\charactersdb_anticheat.sql` incluido en su base de datos de personajes y ejecute `\sql\world\Acore_strings.sql` en su base de datos world. Esto crea las tablas necesarias para este módulo.
 
 **Eso es todo.**
 
@@ -37,7 +37,7 @@ Si necesita cambiar la configuración del módulo, vaya a la carpeta de configur
 # Problemas conocidos y lista de TODO:
 
 - [ ] Identifique cualquier clase/hechizo que dé falsos positivos, hasta ahora solo se ha informado blink y killingspree.
-- [ ] CActualmente no hay una columna dedicada para ignorar el control o el informe de hack de teletransporte, pero los números se agregan al informe total. Los mensajes personalizados se ajustan en Acore_string para esos dos anticheats. La razón es que, por alguna maldita razón, estamos obteniendo números altos poco realistas que se informan en el sql si agrego otra columna o dos. No tengo idea de por qué sucede eso.
+- [ ] CActualmente no hay una columna dedicada para ignorar el control o el informe de hack de teletransporte, pero los números se agregan al informe total. Los mensajes personalizados se ajustan en `acore_string` para esos dos anticheats. La razón es que, por alguna maldita razón, estamos obteniendo números altos poco realistas que se informan en el sql si agrego otra columna o dos. No tengo idea de por qué sucede eso.
 
 # Localizar Acore_Strings
 - [x] LOCALE_enUS = 0

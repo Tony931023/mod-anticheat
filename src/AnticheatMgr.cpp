@@ -186,6 +186,73 @@ void AnticheatMgr::IgnoreControlHackDetection(Player* player, MovementInfo movem
     }
 }
 
+void AnticheatMgr::ZAxisHackDetection(Player* player, MovementInfo movementInfo)
+{
+    if (!sConfigMgr->GetOption<bool>("Anticheat.DetectZaxisHack", true))
+        return;
+
+    // if we are a ghost we can walk on water may false flag z -axis
+    if (player->HasAuraType(SPELL_AURA_GHOST))
+        return;
+
+    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_SWIMMING))
+        return;
+
+    ObjectGuid key = player->GetGUID();
+
+    float lastX = m_Players[key].GetLastMovementInfo().pos.GetPositionX();
+    float newX = movementInfo.pos.GetPositionX();
+
+    float lastY = m_Players[key].GetLastMovementInfo().pos.GetPositionY();
+    float newY = movementInfo.pos.GetPositionY();
+
+    float xDiff = fabs(lastX - newX);
+    float yDiff = fabs(lastY - newY);
+
+    float groundZ_vmap = player->GetMap()->GetHeight(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), true, 50.0f);
+    float groundZ_dyntree = player->GetMap()->GetDynamicMapTree().getHeight(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 50.0f, player->GetPhaseMask());
+    float groundZ = std::max<float>(groundZ_vmap, groundZ_dyntree);
+
+    if (m_Players[key].GetLastMovementInfo().HasMovementFlag(MOVEMENTFLAG_WATERWALKING) && movementInfo.HasMovementFlag(MOVEMENTFLAG_WATERWALKING))
+        return;
+
+    switch (player->GetAreaId())
+    {
+        case 4281: //Acherus: The Ebon Hold
+        case 4342: //Acherus: The Ebon Hold
+            return;
+        break;
+            default:
+        break;// Should never happen
+    }
+
+    if ((xDiff || yDiff) && m_Players[key].GetLastMovementInfo().pos.GetPositionZ() == movementInfo.pos.GetPositionZ()
+        && player->GetPositionZ() >= groundZ + 5.0f)
+    {
+        if (m_Players[key].GetTotalReports() > sConfigMgr->GetOption<uint32>("Anticheat.ReportsForIngameWarnings", 70))
+        {
+            // display warning at the center of the screen, hacky way?
+            std::string str = "";
+            str = "|cFFFFFC00[Playername:|cFF00FFFF[|cFF60FF00" + std::string(player->GetName().c_str()) + "|cFF00FFFF] Possible Ignore Zaxis Hack Detected!";
+            WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+            data << str;
+            sWorld->SendGlobalGMMessage(&data);
+            // need better way to limit chat spam
+            if (m_Players[key].GetTotalReports() >= sConfigMgr->GetOption<uint32>("Anticheat.ReportinChat.Min", 70) && m_Players[key].GetTotalReports() <= sConfigMgr->GetOption<uint32>("Anticheat.ReportinChat.Max", 80))
+            {
+                sWorld->SendGMText(LANG_ANTICHEAT_ALERT, player->GetName().c_str());
+            }
+        }
+        if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true))
+        {
+            LOG_INFO("module", "AnticheatMgr:: Ignore Zaxis Hack detected player {} ({})", player->GetName(), player->GetGUID().ToString());
+        }
+ 
+        BuildReport(player, ZAXIS_HACK_REPORT);
+    }
+ 
+}
+
 void AnticheatMgr::TeleportHackDetection(Player* player, MovementInfo movementInfo)
 {
     if (!sConfigMgr->GetOption<bool>("Anticheat.DetectTelePortHack", true))
@@ -257,6 +324,7 @@ void AnticheatMgr::StartHackDetection(Player* player, MovementInfo movementInfo,
     ClimbHackDetection(player, movementInfo, opcode);
     TeleportHackDetection(player, movementInfo);
     IgnoreControlHackDetection(player, movementInfo);
+    ZAxisHackDetection(player, movementInfo);
     m_Players[key].SetLastMovementInfo(movementInfo);
     m_Players[key].SetLastOpcode(opcode);
 }
@@ -371,7 +439,8 @@ void AnticheatMgr::SpeedHackDetection(Player* player, MovementInfo movementInfo)
         moveType = MOVE_RUN;
 
     // how many yards the player can do in one sec.
-    uint32 speedRate = (uint32)(player->GetSpeed(UnitMoveType(moveType)) + movementInfo.jump.xyspeed);
+    // We remove the added speed for jumping because otherwise permanently jumping doubles your allowed speed
+    uint32 speedRate = (uint32)(player->GetSpeed(UnitMoveType(moveType)));
 
     // how long the player took to move to here.
     uint32 timeDiff = getMSTimeDiff(m_Players[key].GetLastMovementInfo().time, movementInfo.time);
@@ -405,15 +474,21 @@ void AnticheatMgr::SpeedHackDetection(Player* player, MovementInfo movementInfo)
     // this is the distance doable by the player in 1 sec, using the time done to move to this point.
     uint32 clientSpeedRate = distance2D * 1000 / timeDiff;
 
-    // we did the (uint32) cast to accept a margin of tolerance
-    if (clientSpeedRate > speedRate * 1.25f)
+    // We did the (uint32) cast to accept a margin of tolerance
+    // We check the last MovementInfo for the falling flag since falling down a hill and sliding a bit triggered a false positive
+    if ((clientSpeedRate > speedRate * 1.25f) && !m_Players[key].GetLastMovementInfo().HasMovementFlag(MOVEMENTFLAG_FALLING))
     {
-        if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true))
+        if (!player->CanTeleport())
         {
-            LOG_INFO("module", "AnticheatMgr:: Speed-Hack detected player {} ({})", player->GetName(), player->GetGUID().ToString());
-        }
+            if (sConfigMgr->GetOption<bool>("Anticheat.WriteLog", true))
+            {
+                LOG_INFO("module", "AnticheatMgr:: Speed-Hack detected player {} ({})", player->GetName(), player->GetGUID().ToString());
+            }
 
-        BuildReport(player, SPEED_HACK_REPORT);
+            BuildReport(player, SPEED_HACK_REPORT);
+        }
+        else if (player->CanTeleport())
+            player->SetCanTeleport(false);
     }
 }
 
@@ -470,8 +545,22 @@ bool AnticheatMgr::MustCheckTempReports(uint8 type)
     if (type == IGNORE_CONTROL_REPORT)
         return false;
 
+    if (type == ZAXIS_HACK_REPORT)
+        return false;
+
     return true;
 }
+
+//
+// Dear maintainer:
+//
+// Once you are done trying to 'optimize' this script,
+// and have identify potentionally if there was a terrible
+// mistake that was here or not, please increment the
+// following counter as a warning to the next guy:
+//
+// total_hours_wasted_here = 42
+//
 
 void AnticheatMgr::BuildReport(Player* player, uint16 reportType)
 {

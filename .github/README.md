@@ -26,7 +26,7 @@ or you can manually [download the module](https://github.com/azerothcore/mod-ant
 
 ### 2) Re-run cmake and launch a clean build of AzerothCore
 
-### 3) Execute the included "\sql\characters\base\charactersdb_anticheat.sql" file on your characters database and excute  "\sql\world\Acore_strings.sql" on your world datase. This creates the necessary tables for this module.
+### 3) Execute the included `\sql\characters\base\charactersdb_anticheat.sql` file on your characters database and excute  `\sql\world\Acore_strings.sql` on your world datase. This creates the necessary tables for this module.
 
 **That's it.**
 
@@ -37,7 +37,7 @@ If you need to change the module configuration, go to your server configuration 
 # Known issues and TODO list:
 
 - [ ] Identify any class\spells that gives false positives, so far only blink and killingspree has been reported
-- [ ] Currently no dedicated collumn for ignore control or teleport hack reporting, but the numbers are added to total report. Custom Messages are adjusted in Acore_string for those two anticheats. The reason being is for some damn reason we are getting unrealistic high numbers being reported in the sql if i add in another collumn or two. I have no idea why that happens.
+- [ ] Currently no dedicated collumn for ignore control or teleport hack reporting, but the numbers are added to total report. Custom Messages are adjusted in `acore_string` for those two anticheats. The reason being is for some damn reason we are getting unrealistic high numbers being reported in the sql if i add in another collumn or two. I have no idea why that happens.
 
 # Localize Acore_Strings
 - [x] LOCALE_enUS = 0
