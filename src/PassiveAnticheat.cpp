@@ -24,11 +24,9 @@
 
 void startAnticheatScripts();
 void AddSC_anticheat_commandscript();
-void AddAntiCheatDBLoadingScripts();
 
 void Addmod_anticheatScripts()
 {
     startAnticheatScripts();
     AddSC_anticheat_commandscript();
-    AddAntiCheatDBLoadingScripts();
 }

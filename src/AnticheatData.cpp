@@ -27,6 +27,7 @@
 AnticheatData::AnticheatData()
 {
     lastOpcode = 0;
+    lastSpeedRate = 0.0f;
     totalReports = 0;
     for (uint8 i = 0; i < MAX_REPORT_TYPES; i++)
     {
@@ -34,13 +35,22 @@ AnticheatData::AnticheatData()
         tempReports[i] = 0;
         tempReportsTimer[i] = 0;
     }
-    average = 0;
+    average = 0.0f;
     creationTime = 0;
     hasDailyReport = false;
+    justUsedMovementSpell = false;
 }
 
 AnticheatData::~AnticheatData()
 {
+}
+
+void AnticheatData::SetLastInformations(MovementInfo movementInfo, uint32 opcode, uint32 mapId, float speedRate)
+{
+    SetLastMovementInfo(movementInfo);
+    SetLastOpcode(opcode);
+    SetLastMapId(mapId);
+    SetLastSpeedRate(speedRate);
 }
 
 void AnticheatData::SetDailyReportState(bool b)
@@ -58,9 +68,10 @@ void AnticheatData::SetLastOpcode(uint32 opcode)
     lastOpcode = opcode;
 }
 
-void AnticheatData::SetPosition(float x, float y, float z, float o)
+void AnticheatData::SetPosition(float x, float y, float z, float o, uint32 mapId)
 {
     lastMovementInfo.pos = { x, y, z, o };
+    SetLastMapId(mapId);
 }
 
 uint32 AnticheatData::GetLastOpcode() const
@@ -88,12 +99,12 @@ void AnticheatData::SetTotalReports(uint32 _totalReports)
     totalReports = _totalReports;
 }
 
-void AnticheatData::SetTypeReports(uint32 type, uint32 amount)
+void AnticheatData::SetTypeReports(uint8 type, uint32 amount)
 {
     typeReports[type] = amount;
 }
 
-uint32 AnticheatData::GetTypeReports(uint32 type) const
+uint32 AnticheatData::GetTypeReports(uint8 type) const
 {
     return typeReports[type];
 }

@@ -36,7 +36,7 @@
 class Player;
 class AnticheatData;
 
-enum ReportTypes
+enum ReportTypes : uint8
 {
     SPEED_HACK_REPORT = 0,
     FLY_HACK_REPORT = 1,
@@ -103,14 +103,14 @@ class AnticheatMgr
 
         uint32 GetTotalReports(ObjectGuid guid);
         float GetAverage(ObjectGuid guid);
-        uint32 GetTypeReports(ObjectGuid guid, uint8 type);
+        uint32 GetTypeReports(ObjectGuid guid, ReportTypes type);
+
+        [[nodiscard]] const char* GetReportNameFromReportType(ReportTypes reportType);
 
         void AnticheatGlobalCommand(ChatHandler* handler);
         void AnticheatDeleteCommand(ObjectGuid guid);
         void AnticheatPurgeCommand(ChatHandler* handler);
         void ResetDailyReportStates();
-        void SetMapId(uint32 MapID) { m_MapId = MapID; }
-        [[nodiscard]] uint32 GetMapId() const { return m_MapId; }
 
     private:
         void SpeedHackDetection(Player* player, MovementInfo movementInfo);
@@ -126,16 +126,22 @@ class AnticheatMgr
         void AntiSwimHackDetection(Player* player, MovementInfo movementInfo, uint32 opcode);
         void AntiKnockBackHackDetection(Player* player, MovementInfo movementInfo);
         void NoFallDamageDetection(Player* player, MovementInfo movementInfo);
-        void BGreport(Player* player);
-        void CheckStartPositions(Player* player);
+        void BGreport(Player* player, MovementInfo movementInfo);
+        void CheckStartPositions(Player* player, MovementInfo movementInfo);
         void BGStartExploit(Player* player, MovementInfo movementInfo);
-        void BuildReport(Player* player,uint16 reportType);
-        bool MustCheckTempReports(uint8 type);
-        uint32 _counter = 0;
-        uint32 _alertFrequency = 0;
-        uint32 _assignedspeeddiff = 0;
+        void BuildReport(Player* player, ReportTypes reportType, Optional<MovementInfo> optMovementInfo);
+        bool MustCheckTempReports(ReportTypes type);
+        void SendMiddleScreenGMMessage(std::string str);
+
+        [[nodiscard]] uint32 GetAlertFrequencyConfigFromReportType(ReportTypes reportType);
+        [[nodiscard]] uint32 GetMinimumReportInChatThresholdConfigFromReportType(ReportTypes reportType);
+        [[nodiscard]] uint32 GetMaximumReportInChatThresholdConfigFromReportType(ReportTypes reportType);
+        void BuildAndSendReportToIngameGameMasters(Player* player, ReportTypes reportType, Optional<MovementInfo> optMovementInfo);
+
+        [[nodiscard]] uint32 GetTeleportSkillCooldownDurationInMS(Player* player) const;
+        [[nodiscard]] float GetTeleportSkillDistanceInYards(Player* player) const;
+        [[nodiscard]] float GetPlayerCurrentSpeedRate(Player* player) const;
         uint32 _updateCheckTimer = 4000;
-        uint32 m_MapId;
         std::array<Position, PVP_TEAMS_COUNT> _startPosition;
         Position const* GetTeamStartPosition(TeamId teamId) const;
         AnticheatPlayersDataMap m_Players;                        ///< Player data
